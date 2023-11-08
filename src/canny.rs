@@ -4,10 +4,6 @@
  */
 
 mod gaussian;
-mod gradient;
-mod suppression;
-mod threshold;
-mod hysteresis;
 
 use image::{ImageBuffer, RgbImage};
 
