@@ -1,6 +1,6 @@
 /*
     Uncanny: An edge detection runner
-    using Canny's edge detection operator
+    using Canny edge detection operator
  */
 
 mod canny;
