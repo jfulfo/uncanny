@@ -4,6 +4,7 @@
  */
 
 use std::collections::HashMap;
+use std::io::Write;
 use std::path::Path;
 
 fn args_invalid(message: &str) {
@@ -17,12 +18,27 @@ fn get_args() -> Vec<String> {
 }
 
 fn ask_if_overwrite_file() {
-    println!("File already exists. Overwrite? (Y/n)");
-    let mut input = String::new();
-    std::io::stdin().read_line(&mut input).unwrap();
-    input = input.trim().to_string().to_lowercase();
-    if input == "n" {
+    print!("Output file already exists. Overwrite? (y/n) ");
+    std::io::stdout().flush().unwrap();
+    let mut response = String::new();
+    std::io::stdin().read_line(&mut response).unwrap();
+    if response.trim() == "n" {
         std::process::exit(0);
+    }
+}
+
+fn path_is_video(path: String) -> bool {
+    match Path::new(&path).extension() {
+        Some(extension) => {
+            if extension == "mp4" {
+                true
+            } else {
+                false
+            }
+        },
+        None => {
+            false
+        }
     }
 }
 
@@ -46,6 +62,7 @@ fn verify_args(args: Vec<String>) -> HashMap<String, String> {
 
     arg_map.insert("input_path".to_string(), input_path.to_string());
     arg_map.insert("output_path".to_string(), output_path.to_string());
+    arg_map.insert("is_video".to_string(), path_is_video(input_path.to_string()).to_string());
 
     if !Path::new(&arg_map["input_path"]).exists() {
         panic!("Input file does not exist");

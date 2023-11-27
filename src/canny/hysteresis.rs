@@ -4,7 +4,8 @@
 
 use crate::canny::{STRONG_EDGE, WEAK_EDGE};
 
-fn connected_to_strong_edge(matrix: &Vec<Vec<f64>>, i: usize, j: usize) -> bool {
+#[inline]
+fn connected_to_strong_edge(matrix: &Vec<Vec<f32>>, i: usize, j: usize) -> bool {
     let rows = matrix.len();
     let cols = matrix[0].len();
     if i == 0 || i == rows - 1 || j == 0 || j == cols - 1 {
@@ -24,7 +25,7 @@ fn connected_to_strong_edge(matrix: &Vec<Vec<f64>>, i: usize, j: usize) -> bool 
 
 }
 
-pub(crate) fn hysteresis(input_matrix: Vec<Vec<f64>>) -> Vec<Vec<f64>> {
+pub(crate) fn hysteresis(input_matrix: Vec<Vec<f32>>) -> Vec<Vec<f32>> {
     let rows = input_matrix.len();
     let cols = input_matrix[0].len();
     let mut output_matrix = input_matrix.clone();

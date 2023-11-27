@@ -3,29 +3,35 @@
  */
 
 use image::{RgbImage};
+use rayon::prelude::*;
 
-pub(crate) fn matrix_to_image(matrix: Vec<Vec<f64>>, height: u32, width: u32) -> RgbImage {
+pub(crate) fn matrix_to_image(matrix: Vec<Vec<f32>>, height: u32, width: u32) -> RgbImage {
     let mut image = RgbImage::new(width, height);
-    for (x, y, pixel) in image.enumerate_pixels_mut() {
-        let value = matrix[x as usize][y as usize];
-        *pixel = image::Rgb([value as u8, value as u8, value as u8]);
-    }
+
+    // Accessing the underlying buffer directly
+    let buffer = image.as_mut();
+    buffer.par_chunks_mut(3).enumerate().for_each(|(index, pixel)| {
+        let x = (index as u32) % width;
+        let y = (index as u32) / width;
+        let value = matrix[x as usize][y as usize] as u8;
+        pixel.copy_from_slice(&[value, value, value]);
+    });
+
     image
 }
 
-pub(crate) fn image_to_matrix(input_image: &RgbImage) -> Vec<Vec<f64>> {
-    let mut matrix: Vec<Vec<f64>> = Vec::with_capacity(input_image.width() as usize);
+pub(crate) fn image_to_matrix(input_image: &RgbImage) -> Vec<Vec<f32>> {
+    let width = input_image.width() as usize;
+    let height = input_image.height() as usize;
 
-    for _ in 0..input_image.width() {
-        let mut row: Vec<f64> = Vec::with_capacity(input_image.height() as usize);
-        for _ in 0..input_image.height() {
-            row.push(0.0);
+    let mut matrix: Vec<Vec<f32>> = vec![vec![0.0; height]; width];
+
+    matrix.par_iter_mut().enumerate().for_each(|(x, col)| {
+        for y in 0..height {
+            let pixel = input_image.get_pixel(x as u32, y as u32);
+            col[y] = pixel[0] as f32;
         }
-        matrix.push(row);
-    }
+    });
 
-    for (x, y, pixel) in input_image.enumerate_pixels() {
-        matrix[x as usize][y as usize] = pixel[0] as f64;
-    }
     matrix
 }

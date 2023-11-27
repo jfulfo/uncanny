@@ -8,13 +8,13 @@ use crate::canny::convolution::convolve_matrices;
 
 use std::vec::Vec;
 
-pub(crate) fn gradient(input_matrix: Vec<Vec<f64>>) -> (Vec<Vec<f64>>, Vec<Vec<f64>>) {
-    let sobel_x: Vec<Vec<f64>> = vec![
+pub(crate) fn gradient(input_matrix: Vec<Vec<f32>>) -> (Vec<Vec<f32>>, Vec<Vec<f32>>) {
+    let sobel_x: Vec<Vec<f32>> = vec![
         vec![-1.0, 0.0, 1.0],
         vec![-2.0, 0.0, 2.0],
         vec![-1.0, 0.0, 1.0]
     ];
-    let sobel_y: Vec<Vec<f64>> = vec![
+    let sobel_y: Vec<Vec<f32>> = vec![
         vec![-1.0, -2.0, -1.0],
         vec![0.0, 0.0, 0.0],
         vec![1.0, 2.0, 1.0]

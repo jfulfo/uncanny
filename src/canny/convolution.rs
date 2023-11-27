@@ -2,25 +2,26 @@
     Naively convolves a kernel with a matrix.
  */
 
-fn convolution_at_index(kernel: &[Vec<f64>], matrix: &[Vec<f64>], i: usize, j: usize) -> f64 {
-    let mut sum: f64 = 0.0;
-    for (k, kernel_row) in kernel.iter().enumerate() {
-        for (l, &kernel_val) in kernel_row.iter().enumerate() {
-            sum += kernel_val * matrix[i + k][j + l];
-        }
-    }
-    sum
-}
+ use rayon::prelude::*;
 
-pub(crate) fn convolve_matrices(kernel: &[Vec<f64>], matrix: &[Vec<f64>]) -> Vec<Vec<f64>> {
+
+pub(crate) fn convolve_matrices(kernel: &[Vec<f32>], matrix: &[Vec<f32>]) -> Vec<Vec<f32>> {
     let kernel_rows = kernel.len();
     let kernel_cols = kernel[0].len();
     let rows = matrix.len() - kernel_rows + 1;
     let cols = matrix[0].len() - kernel_cols + 1;
 
-    (0..rows).map(|i| {
-        (0..cols).map(|j| {
-            convolution_at_index(kernel, matrix, i, j)
-        }).collect()
-    }).collect()
+    let mut result = vec![vec![0.0; cols]; rows];
+
+    result.par_iter_mut().enumerate().for_each(|(i, result_row)| {
+        for (j, result_cell) in result_row.iter_mut().enumerate().take(cols) {
+            *result_cell = kernel.iter().take(kernel_rows).zip(matrix[i..].iter())
+                .flat_map(|(kernel_row, matrix_row)| {
+                    kernel_row.iter().take(kernel_cols).zip(matrix_row[j..].iter())
+                        .map(|(&k, &m)| k * m)
+                })
+                .sum();
+        }
+    });
+    result
 }

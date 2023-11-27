@@ -2,7 +2,8 @@
     Lower bound cutoff suppression for Canny edge detection
  */
 
-use std::f64::consts::PI;
+use std::f32::consts::PI;
+use rayon::prelude::*;
 
 enum Direction {
     Horizontal,
@@ -11,15 +12,17 @@ enum Direction {
     Diagonal135
 }
 
-fn direction(gradient_x: f64, gradient_y: f64) -> f64 {
+#[inline]
+fn direction(gradient_x: f32, gradient_y: f32) -> f32 {
     (gradient_y / gradient_x).atan()
 }
 
-fn hypot(gradient_x: f64, gradient_y: f64) -> f64 {
+#[inline]
+fn hypot(gradient_x: f32, gradient_y: f32) -> f32 {
     (gradient_x.powi(2) + gradient_y.powi(2)).sqrt()
 }
 
-fn angle_to_direction(theta: f64) -> Direction {
+fn angle_to_direction(theta: f32) -> Direction {
     let theta = theta.abs();
     if theta < PI / 8.0 {
         Direction::Horizontal
@@ -41,20 +44,14 @@ fn angle_to_direction(theta: f64) -> Direction {
     the value will be preserved.
     Otherwise, the value will be suppressed.
  */
-pub(crate) fn suppress(x_gradient: &[Vec<f64>], y_gradient: &[Vec<f64>]) -> Vec<Vec<f64>> {
+pub(crate) fn suppress(x_gradient: &[Vec<f32>], y_gradient: &[Vec<f32>]) -> Vec<Vec<f32>> {
     let rows = x_gradient.len();
     let cols = x_gradient[0].len();
-    let mut suppressed_image: Vec<Vec<f64>> = Vec::with_capacity(x_gradient.len());
+    let mut suppressed_image = vec![vec![0.0; cols]; rows];
 
-    for _ in 0..x_gradient.len() {
-        let mut row: Vec<f64> = Vec::with_capacity(x_gradient[0].len());
-        for _ in 0..x_gradient[0].len() {
-            row.push(0.0);
-        }
-        suppressed_image.push(row);
-    }
+    suppressed_image.par_iter_mut().enumerate().for_each(|(i, row)| {
+        if i == 0 || i == rows - 1 { return; } // Skip the first and last row
 
-    for i in 1..(rows - 1) {
         for j in 1..(cols - 1) {
             let angle = direction(x_gradient[i][j], y_gradient[i][j]);
             let gradient = hypot(x_gradient[i][j], y_gradient[i][j]);
@@ -63,7 +60,7 @@ pub(crate) fn suppress(x_gradient: &[Vec<f64>], y_gradient: &[Vec<f64>]) -> Vec<
                 Direction::Horizontal => (0, 1),
                 Direction::Vertical => (1, 0),
                 Direction::Diagonal45 => (1, 1),
-                Direction::Diagonal135 => (1, -1)
+                Direction::Diagonal135 => (1, -1),
             };
 
             let i_pos = i.checked_add(i_offset);
@@ -74,11 +71,11 @@ pub(crate) fn suppress(x_gradient: &[Vec<f64>], y_gradient: &[Vec<f64>]) -> Vec<
             if let (Some(i_pos), Some(j_pos), Some(i_neg), Some(j_neg)) = (i_pos, j_pos, i_neg, j_neg) {
                 if gradient > hypot(x_gradient[i_neg][j_neg], y_gradient[i_neg][j_neg]) &&
                     gradient > hypot(x_gradient[i_pos][j_pos], y_gradient[i_pos][j_pos]) {
-                    suppressed_image[i][j] = gradient;
+                    row[j] = gradient;
                 }
             }
         }
-    }
+    });
 
     suppressed_image
 }
