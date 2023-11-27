@@ -11,7 +11,7 @@ mod hysteresis;
 mod matrix_image_converter;
 mod convolution;
 
-use image::{RgbImage};
+use image::RgbImage;
 use std::time::Instant;
 
 pub(crate) const STRONG_EDGE: f32 = 255.0;
