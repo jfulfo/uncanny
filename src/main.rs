@@ -4,11 +4,12 @@
  */
 
 mod args;
-//mod video_processor;
+mod video_processor;
 mod canny;
 
 use image;
 use std::time::Instant;
+use std::process::exit;
 
 
 fn main() {
@@ -17,8 +18,11 @@ fn main() {
     let start = Instant::now();
 
     if is_video {
-        //video_processor::process_video(&args["input_path"], &args["output_path"]);
-        println!("Video processing not yet implemented")
+        let result = video_processor::process_video(&args["input_path"], &args["output_path"]);
+        if result.is_err() {
+            println!("Error: {:?}", result.err().unwrap());
+            exit(1); 
+        }
     } else {
         let input_image = image::open(&args["input_path"]).unwrap().to_rgb8();
         let input_time = start.elapsed();

@@ -8,7 +8,7 @@ use std::io::Write;
 use std::path::Path;
 
 fn args_invalid(message: &str) {
-    println!("Usage: ./rusty-compiler <input file> <output file>");
+    println!("Usage: ./uncanny <input file> <output file>");
     println!("{}", message);
 }
 

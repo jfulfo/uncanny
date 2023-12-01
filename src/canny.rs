@@ -11,7 +11,7 @@ mod hysteresis;
 mod matrix_image_converter;
 mod convolution;
 
-use image::RgbImage;
+use image::{RgbImage, GenericImage};
 use std::time::Instant;
 
 pub(crate) const STRONG_EDGE: f32 = 255.0;
@@ -31,21 +31,23 @@ pub(crate) const LOW_THRESHOLD: f32 = 25.0;
 pub(crate) fn canny(input_image: &RgbImage) -> RgbImage {
     let new_height = input_image.height() - gaussian::GAUSSIAN_KERNEL_ROWS as u32 - 1;
     let new_width = input_image.width() - gaussian::GAUSSIAN_KERNEL_COLS as u32 - 1;
-    let start = Instant::now();
+    //let start = Instant::now();
     let input_matrix = matrix_image_converter::image_to_matrix(&input_image);
-    println!("Image to matrix: {:?}", start.elapsed());
+    //println!("Image to matrix: {:?}", start.elapsed());
     let mut output_matrix = gaussian::gaussian(input_matrix);
-    println!("Gaussian: {:?}", start.elapsed());
+    //println!("Gaussian: {:?}", start.elapsed());
     let (x_gradient, y_gradient) = gradient::gradient(output_matrix);
-    println!("Gradient: {:?}", start.elapsed());
+    //println!("Gradient: {:?}", start.elapsed());
     output_matrix = suppression::suppress(&x_gradient, &y_gradient);
-    println!("Suppression: {:?}", start.elapsed());
+    //println!("Suppression: {:?}", start.elapsed());
     output_matrix = threshold::threshold(output_matrix, HIGH_THRESHOLD, LOW_THRESHOLD, STRONG_EDGE, WEAK_EDGE);
-    println!("Threshold: {:?}", start.elapsed());
+    //println!("Threshold: {:?}", start.elapsed());
     output_matrix = hysteresis::hysteresis(output_matrix);
-    println!("Hysteresis: {:?}", start.elapsed());
+    //println!("Hysteresis: {:?}", start.elapsed());
 
     let img: RgbImage = matrix_image_converter::matrix_to_image(output_matrix, new_height, new_width);
-    println!("Matrix to image: {:?}", start.elapsed());
-    img
+    //println!("Matrix to image: {:?}", start.elapsed());
+    let mut output_image = RgbImage::new(input_image.width(), input_image.height());
+    output_image.copy_from(&img, 0, 0).unwrap();
+    output_image
 }
