@@ -5,8 +5,8 @@ use image::RgbImage;
 use ndarray::{ArrayBase, OwnedRepr, Dim};
 use crate::canny::canny;
 
-const DEFAULT_HEIGHT: u32 = 480;
-const DEFAULT_WIDTH: u32 = 720;
+const DEFAULT_HEIGHT: u32 = 720;
+const DEFAULT_WIDTH: u32 = 1280;
 
 fn get_canny_frame(frame: ArrayBase<OwnedRepr<u8>, Dim<[usize; 3]>>) -> ArrayBase<OwnedRepr<u8>, Dim<[usize; 3]>> {
     // convert frame to RgbImage
@@ -44,7 +44,6 @@ pub(crate) fn process_video(input_path: &str, output_path: &str) -> Result<(), E
             let input_frame = frame_tuple.1; 
             let output_frame = get_canny_frame(input_frame);
             encoder.encode(&output_frame, &timestamp).unwrap();
-            println!("processed frame {}", frame_count);
             frame_count += 1;
         });
     encoder.finish()

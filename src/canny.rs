@@ -31,7 +31,7 @@ pub(crate) const LOW_THRESHOLD: f32 = 25.0;
 pub(crate) fn canny(input_image: &RgbImage) -> RgbImage {
     let new_height = input_image.height() - gaussian::GAUSSIAN_KERNEL_ROWS as u32 - 1;
     let new_width = input_image.width() - gaussian::GAUSSIAN_KERNEL_COLS as u32 - 1;
-    //let start = Instant::now();
+    let start = Instant::now();
     let input_matrix = matrix_image_converter::image_to_matrix(&input_image);
     //println!("Image to matrix: {:?}", start.elapsed());
     let mut output_matrix = gaussian::gaussian(input_matrix);
@@ -49,5 +49,6 @@ pub(crate) fn canny(input_image: &RgbImage) -> RgbImage {
     //println!("Matrix to image: {:?}", start.elapsed());
     let mut output_image = RgbImage::new(input_image.width(), input_image.height());
     output_image.copy_from(&img, 0, 0).unwrap();
+    println!("cannified in {:?}", start.elapsed());
     output_image
 }
