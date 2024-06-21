@@ -35,7 +35,6 @@ pub(crate) fn process_video(input_path: &str, output_path: &str) -> Result<(), E
         Resize::Exact(DEFAULT_WIDTH, DEFAULT_HEIGHT),
     ).unwrap();
 
-    let mut frame_count = 1;
     decoder.decode_iter()
         .take_while(Result::is_ok)
         .for_each(|frame| {
@@ -44,7 +43,6 @@ pub(crate) fn process_video(input_path: &str, output_path: &str) -> Result<(), E
             let input_frame = frame_tuple.1; 
             let output_frame = get_canny_frame(input_frame);
             encoder.encode(&output_frame, &timestamp).unwrap();
-            frame_count += 1;
         });
     encoder.finish()
 }
