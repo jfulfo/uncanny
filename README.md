@@ -1,6 +1,7 @@
 # Canny Edge Detection
 
-I did this project to learn rust. See examples below
+Did this project in a weekend to learn rust. 
+Parallelized with Rayon, computes frames in realtime.
 
 ### Examples
 
