@@ -16,6 +16,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install Dependencies
+        run: sudo apt install -y clang libavcodec-dev libavformat-dev libavutil-dev pkg-config 
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
