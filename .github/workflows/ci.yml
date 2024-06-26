@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Dependencies
-        run: sudo apt install -y clang libavcodec-dev libavformat-dev libavutil-dev pkg-config 
+        run: sudo apt update && sudo apt install -y clang libavcodec-dev libavformat-dev libavutil-dev libavdevice-dev libavfilter-dev pkg-config 
 
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
