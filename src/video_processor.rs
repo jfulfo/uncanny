@@ -1,5 +1,6 @@
 
 use video_rs::*;
+use video_rs::encode::*;
 use std::path::PathBuf;
 use image::RgbImage;
 use ndarray::{ArrayBase, OwnedRepr, Dim};
@@ -26,13 +27,13 @@ fn get_canny_frame(frame: ArrayBase<OwnedRepr<u8>, Dim<[usize; 3]>>) -> ArrayBas
 pub(crate) fn process_video(input_path: &str, output_path: &str) -> Result<(), Error> {
     video_rs::init().unwrap();
     let mut encoder = Encoder::new(
-        &PathBuf::from(output_path).into(),
-        EncoderSettings::for_h264_yuv420p(DEFAULT_WIDTH as usize, DEFAULT_HEIGHT as usize, true),
+        PathBuf::from(output_path),
+        Settings::preset_h264_yuv420p(DEFAULT_WIDTH as usize, DEFAULT_HEIGHT as usize, true),
     ).unwrap();
-    let mut decoder = Decoder::new_with_options_and_resize(
-        &PathBuf::from(input_path).into(),
-        &Options::new_h264(),
-        Resize::Exact(DEFAULT_WIDTH, DEFAULT_HEIGHT),
+    let mut decoder = Decoder::new(
+        PathBuf::from(input_path)
+        //&Options::new_h264(),
+        //Resize::Exact(DEFAULT_WIDTH, DEFAULT_HEIGHT),
     ).unwrap();
 
     decoder.decode_iter()
@@ -42,7 +43,7 @@ pub(crate) fn process_video(input_path: &str, output_path: &str) -> Result<(), E
             let timestamp = frame_tuple.0;
             let input_frame = frame_tuple.1; 
             let output_frame = get_canny_frame(input_frame);
-            encoder.encode(&output_frame, &timestamp).unwrap();
+            encoder.encode(&output_frame, timestamp).unwrap();
         });
     encoder.finish()
 }

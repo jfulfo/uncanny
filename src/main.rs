@@ -7,7 +7,11 @@ mod args;
 mod video_processor;
 mod canny;
 
-use image;
+extern crate rayon;
+extern crate image;
+extern crate video_rs;
+extern crate ndarray;
+
 use std::time::Instant;
 use std::process::exit;
 

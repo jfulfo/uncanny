@@ -1,6 +1,7 @@
 /*
     Naively convolves a kernel with a matrix.
  */
+extern crate rayon;
 
 use rayon::prelude::*;
 
@@ -12,7 +13,6 @@ pub(crate) fn convolve_matrices(kernel: &[Vec<f32>], matrix: &[Vec<f32>]) -> Vec
 
     let mut result = vec![vec![0.0; cols]; rows];
 
-    // hatred
     result.par_iter_mut().enumerate().for_each(|(i, result_row)| {
         for (j, result_cell) in result_row.iter_mut().enumerate().take(cols) {
             *result_cell = kernel.iter().take(kernel_rows).zip(matrix[i..].iter())

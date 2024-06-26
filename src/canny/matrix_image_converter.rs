@@ -2,7 +2,7 @@
     Utils for converting between image and matrix
  */
 
-use image::{RgbImage};
+use image::RgbImage;
 use rayon::prelude::*;
 
 pub(crate) fn matrix_to_image(matrix: Vec<Vec<f32>>, height: u32, width: u32) -> RgbImage {
